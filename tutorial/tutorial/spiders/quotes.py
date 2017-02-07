@@ -14,10 +14,12 @@ class QuotesSpider(scrapy.Spider):
 
     # shorthand for start_requests with default implementation
     start_urls = [
-        'http://quotes.toscrape.com/page/1/',
-        'http://quotes.toscrape.com/page/2/',
+        'http://quotes.toscrape.com/page/1/'
     ]
 
+    """
+    Using css selectors
+    """
     def parse(self, response):
         for quote in response.css('div.quote'):
             yield {
@@ -25,8 +27,20 @@ class QuotesSpider(scrapy.Spider):
                 'author': quote.css('span small::text').extract_first(),
                 'tags': quote.css('div.tags a.tag::text').extract(),
             }
-        # page = response.url.split("/")[-2]
-        # filename = 'quotes-%s.html' % page
-        # with open(filename, 'wb') as f:
-        #     f.write(response.body)
-        # self.log('Saved file %s' % filename)
+
+        next_page = response.css('li.next a::attr(href)').extract_first()
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
+
+    # """Run to save into json"""
+    # scrapy crawl quotes -o quotes.json
+
+    # """
+    # This bit saves them pages to a new copy.
+    # """
+    # page = response.url.split("/")[-2]
+    # filename = 'quotes-%s.html' % page
+    # with open(filename, 'wb') as f:
+    #     f.write(response.body)
+    # self.log('Saved file %s' % filename)
