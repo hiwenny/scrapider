@@ -10,5 +10,7 @@ import scrapy
 
 class TutorialItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
+    quote = scrapy.Field()
+    author = scrapy.Field()
+    tags = scrapy.Field()
     pass
