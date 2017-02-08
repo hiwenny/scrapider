@@ -17,13 +17,10 @@ class QuotesSpider(scrapy.Spider):
         'http://quotes.toscrape.com/page/1/'
     ]
 
-    """
-    Using css selectors
-    """
     def parse(self, response):
         for quote in response.css('div.quote'):
             yield {
-                'text': quote.css('span.text::text').extract_first(),
+                'text': response.xpath('//span[@class=\'text\']/text()').extract_first(),
                 'author': quote.css('span small::text').extract_first(),
                 'tags': quote.css('div.tags a.tag::text').extract(),
             }
